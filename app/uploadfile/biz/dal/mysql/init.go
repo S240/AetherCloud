@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"github.com/S240/AetherCloud/app/uploadfile/conf"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

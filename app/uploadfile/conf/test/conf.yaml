@@ -9,15 +9,28 @@ kitex:
 
 registry:
   registry_address:
-    - 127.0.0.1:2379
+    - 127.0.0.1:8500
   username: ""
   password: ""
 
 mysql:
-  dsn: "gorm:gorm@tcp(127.0.0.1:3306)/gorm?charset=utf8mb4&parseTime=True&loc=Local"
+  dsn: "root:root@tcp(127.0.0.1:3306)/file?charset=utf8mb4&parseTime=True&loc=Local"
 
 redis:
   address: "127.0.0.1:6379"
   username: ""
   password: ""
   db: 0
+
+minio:
+  minioendpoint: "47.96.40.3:9000"
+  minioacesskey: "iLp5LAy7m0VQVbtktlzW"
+  miniosecretkey: "lTAzgr9i4LnrNln8qZMObuZL98xIcRCByheuBJnp"
+  miniobucketname: "cloudstore"
+
+rmq:
+  namesrvaddr: ["127.0.0.1:9876"]
+  pgroupname: "producer_minio"
+  cgroupname: "consumer_minio"
+  topicname: "uploadfile"
+  brokeradder: "127.0.0.1:10911"

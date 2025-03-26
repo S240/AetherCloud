@@ -23,6 +23,7 @@ type Config struct {
 	MySQL    MySQL    `yaml:"mysql"`
 	Redis    Redis    `yaml:"redis"`
 	Registry Registry `yaml:"registry"`
+	MinioConfig  	MinioConfig `yaml:"minio"`
 }
 
 type MySQL struct {
@@ -51,6 +52,15 @@ type Registry struct {
 	Username        string   `yaml:"username"`
 	Password        string   `yaml:"password"`
 }
+
+
+type MinioConfig struct {
+	MinioEndPoint     	string	`yaml:"minioendpoint"`
+	MinioAccessKey 		string	`yaml:"minioacesskey"`
+	MinioSecretKey 		string	`yaml:"miniosecretkey"`
+	MinioBucketName 	string	`yaml:"miniobucketname"`
+}
+
 
 // GetConf gets configuration instance
 func GetConf() *Config {

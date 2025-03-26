@@ -1,0 +1,67 @@
+version: "3"
+services:
+  consul:
+    image: "consul:1.15.4"
+    ports:
+      - "8500:8500"
+
+
+  mysql:
+    image: "mysql:latest"
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./docker_env/sql/ini:/docker-entrypoint-initdb.d
+      - ./docker_env/mysql/data:/var/lib/mysql 
+
+
+  redis:
+    image: "redis:latest"
+    ports:
+      - 6379:6379
+  
+  namesrv:
+    image: apache/rocketmq:5.3.1
+    container_name: namesrvrmq
+    ports:
+      - 9876:9876
+    networks:
+      - rocketmq
+    command: sh mqnamesrv
+
+
+  broker:
+    image: apache/rocketmq:5.3.1
+    container_name: brokerrmq
+    ports:
+      - 10909:10909
+      - 10911:10911
+      - 10912:10912
+    environment:
+      - NAMESRV_ADDR=namesrvrmq:9876
+    depends_on:
+      - namesrv
+    networks:
+      - rocketmq
+    command: sh mqbroker
+  
+  rocketmq-console:
+      image: styletang/rocketmq-console-ng
+      container_name: rocketmq-console
+      ports:
+        - 9090:8080
+      environment:
+        - JAVA_OPTS=-Drocketmq.config.namesrvAddr=namesrvrmq:9876 -Xmx256m -Xms128m
+      networks:
+        - rocketmq
+      ulimits:
+        nofile:
+          soft: 65535
+          hard: 65535
+      mem_limit: 512m
+
+networks:
+  rocketmq:
+    driver: bridge

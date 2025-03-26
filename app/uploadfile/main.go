@@ -12,6 +12,8 @@ import (
 	"github.com/S240/AetherCloud/app/uploadfile/kitex_gen/uploadfile/uploadfileservice"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"github.com/S240/AetherCloud/app/uploadfile/biz/dal"
+	consul "github.com/kitex-contrib/registry-consul"
 )
 
 func main() {
@@ -26,6 +28,7 @@ func main() {
 }
 
 func kitexInit() (opts []server.Option) {
+	dal.Init()
 	// address
 	addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
 	if err != nil {
@@ -37,6 +40,13 @@ func kitexInit() (opts []server.Option) {
 	opts = append(opts, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
 		ServiceName: conf.GetConf().Kitex.Service,
 	}))
+	//server registry
+	r, err := consul.NewConsulRegister(conf.GetConf().Registry.RegistryAddress[0])
+	if err != nil {
+		klog.Fatalf("new consul register failed: %v", err)
+	}
+	opts = append(opts, server.WithRegistry(r))
+	
 
 	// klog
 	logger := kitexlogrus.NewLogger()
