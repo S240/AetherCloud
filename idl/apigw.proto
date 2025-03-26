@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package apigw;
+
+option go_package = "apigw";
+import "api.proto";
+import "google/protobuf/any.proto";   
+// 文件上传请求
+message UploadFileRequest {
+    string file_md5 = 1;         // 文件MD5
+    string file_name = 2;        // 文件名称
+    int64 file_size = 3;         // 文件大小
+    bool is_chunked = 4;         // 是否分片
+    int64 chunk_size = 5;        // 分片大小
+}
+// 预签名信息
+message PreSignMessage {
+    string presign_url = 1;      // 预签名 URL
+    int32 part_number = 2;       // 分片序号
+}
+// 文件上传响应
+message UploadFileResponse {
+    repeated PreSignMessage presigned_urls = 1;  // 预签名信息数组
+}
+
+message PartsMessage {
+    int32 part_number = 1; // 分片序号
+    string etag = 2;       // 分片的 Etag
+}
+
+// 上传完成和并请求
+message CompletedUploadRequest {
+    repeated PartsMessage parts = 1; // PartsMessages 数组
+    string file_md5 = 2;             // 文件 MD5
+}
+
+// 标准响应
+message StandardResponse {
+    int32 code = 1;                    // 返回码
+    string message = 2;                // 消息描述
+    google.protobuf.Any data = 3;        // 上传响应内容
+}
+
+service UploadFileService {
+   // 获取文件上传预签名 URL（支持单文件/分片上传）
+   rpc GetUploadPreSignUrls (UploadFileRequest) returns (StandardResponse){
+      option (api.post) = "/file/getuploadurl";  
+   };
+   rpc CompleteUpload (CompletedUploadRequest) returns (StandardResponse){
+      option (api.post) = "/file/completeUpload"; 
+   };
+}

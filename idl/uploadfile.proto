@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package uploadfile;
+
+option go_package = "uploadfile";
+//快传
+message FastLoadRequest{
+    string file_md5 = 1;         // 文件MD5
+    string file_name = 2;        // 文件名称
+    int64 file_size = 3;         // 文件大小
+    bool is_chunked = 4;         // 是否分片
+    int64 chunk_size = 5;        // 分片大小
+}
+message FastLoadResponse{
+    bool is_fastload = 1; 
+}
+
+message PreSignMessage {
+    string presign_url = 1;      // 预签名 URL
+    int32 part_number = 2;       // 分片序号
+}
+message PartsMessage {
+    int32 part_number = 1; // 分片序号
+    string etag = 2;       // 分片的 Etag
+}
+//初始化信息
+message InituploadFileRequest{
+    string file_md5 = 1;         // 文件MD5
+    string file_name = 2;        // 文件名称
+    int64 file_size = 3;         // 文件大小
+    bool is_chunked = 4;         // 是否分片
+    int64 chunk_size = 5;        // 分片大小
+}
+
+message InituploadFileResponse{
+    repeated PartsMessage parts = 1; // PartsMessages 数组
+    string file_md5 = 2;   
+}
+
+service UploadFileService {
+      // 快传文件接口：判断是否支持秒传
+    rpc FastLoadFile (FastLoadRequest) returns (FastLoadResponse) {
+    };
+
+    // 初始化上传接口：返回分片信息等初始化结果
+    rpc InitUploadFile (InituploadFileRequest) returns (InituploadFileResponse) {
+    };
+}
